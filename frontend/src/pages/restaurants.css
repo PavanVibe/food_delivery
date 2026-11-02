@@ -1,0 +1,121 @@
+.restaurant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.restaurant-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.restaurant-card:hover {
+  color: var(--text);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.restaurant-image {
+  height: 170px;
+  background-color: var(--surface-muted);
+  background-size: cover;
+  background-position: center;
+}
+
+.restaurant-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+}
+
+.restaurant-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.restaurant-title h3 {
+  font-size: 1.05rem;
+}
+
+.restaurant-cuisine {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--brand);
+  text-transform: uppercase;
+}
+
+.restaurant-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.restaurant-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.restaurant-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.restaurant-meta .rating {
+  color: #fff;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.restaurant-hero {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  overflow: hidden;
+}
+
+.restaurant-hero-image {
+  min-height: 200px;
+  background-color: var(--surface-muted);
+  background-size: cover;
+  background-position: center;
+}
+
+.restaurant-hero-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px;
+}
+
+.restaurant-hero-body h1 {
+  font-size: 1.9rem;
+}
+
+@media (max-width: 700px) {
+  .restaurant-hero {
+    grid-template-columns: 1fr;
+  }
+}

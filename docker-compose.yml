@@ -1,0 +1,78 @@
+name: foodhub
+
+x-db-url: &db-url postgresql://foodhub:${POSTGRES_PASSWORD:-foodhub}@postgres:5432/foodhub
+x-internal-key: &internal-key ${INTERNAL_API_KEY:-change-me-internal-key}
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: foodhub
+      POSTGRES_USER: foodhub
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-foodhub}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foodhub -d foodhub"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  ai-service:
+    build: ./ai-services
+    environment:
+      DATABASE_URL: *db-url
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-gemini-3.5-flash-lite}
+      INDEX_DIR: /app/indexes/menu
+      INTERNAL_API_KEY: *internal-key
+    volumes:
+      - faiss:/app/indexes
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  backend:
+    build: ./backend
+    environment:
+      PORT: 5000
+      DATABASE_URL: *db-url
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-local-docker-jwt-secret-change-me}
+      CORS_ORIGIN: http://localhost:8080,http://localhost:5173
+      AI_SERVICE_URL: http://ai-service:8000
+      INTERNAL_API_KEY: *internal-key
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  pgdata:
+  faiss:
